@@ -16,9 +16,11 @@ app.post('/minesweeper', async (req, res) => {
     return res.sendStatus(401);
   }
 
-  const { name, reason, site, usedMin, limitMin } = req.body || {};
+  const { name, reason, usedMin, limitMin } = req.body || {};
   const left = Math.max(0, Number(limitMin) - Number(usedMin));
-  const timeLine = Number.isFinite(left) ? `\n⏱️ **${left} min** left to play today` : '';
+  const who = String(name || 'Annie').slice(0, 40);
+
+
 
   // Find the log channel in every server the bot is in
   const channels = client.channels.cache.filter(
@@ -27,9 +29,8 @@ app.post('/minesweeper', async (req, res) => {
   if (channels.size === 0) return res.status(503).send('log channel not found');
 
   const content =
-    `⛏️ **${String(name || 'Someone').slice(0, 40)}** unlocked ${String(site || 'Minesweeper').slice(0, 40)}` +
-    timeLine +
-    `\n> ${String(reason || '').slice(0, 500)}`;
+    (Number.isFinite(left) ? `⏱️ **${left} min** left to play today\n` : '') +
+    `**${who}** said: "${String(reason || '').slice(0, 500)}"`;
 
   try {
     for (const channel of channels.values()) {
